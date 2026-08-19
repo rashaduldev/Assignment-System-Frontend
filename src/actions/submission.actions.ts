@@ -17,12 +17,20 @@ export async function getAssignmentSubmissionProgress(assignmentId: string): Pro
 }
 
 export async function uploadSubmissionPdf(file: File): Promise<string> {
+  return uploadPdf(file, '/uploads/submission-pdf');
+}
+
+export async function uploadReviewedPdf(file: File): Promise<string> {
+  return uploadPdf(file, '/uploads/reviewed-pdf');
+}
+
+async function uploadPdf(file: File, path: string): Promise<string> {
   if (file.type !== 'application/pdf') throw new Error('Only PDF files are allowed');
   if (file.size > 10 * 1024 * 1024) throw new Error('PDF must be 10 MB or smaller');
   const token = await getAccessToken();
   const form = new FormData();
   form.append('file', file);
-  const response = await fetch(`${process.env.API_BASE_URL ?? 'http://localhost:5000/api/v1'}/uploads/submission-pdf`, {
+  const response = await fetch(`${process.env.API_BASE_URL ?? 'http://localhost:5000/api/v1'}${path}`, {
     method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form, cache: 'no-store',
   });
   const json = await response.json().catch(() => null);

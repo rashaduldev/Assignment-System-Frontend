@@ -6,6 +6,8 @@ import { Table, Thead, Tbody, Tr, Th, Td, EmptyState } from '@/components/ui/Tab
 import { StatusBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Field';
+import { Modal } from '@/components/ui/Modal';
+import { PdfAnnotator } from '@/components/features/PdfAnnotator';
 import { formatDateTime } from '@/lib/utils';
 import { userName } from '@/lib/populated';
 import type { Submission } from '@/types';
@@ -14,6 +16,8 @@ function GradeRow({ submission, maxMarks, assignmentId }: { submission: Submissi
   const gradeMutation = useGradeSubmission(assignmentId);
   const [marks, setMarks] = useState(submission.marks?.toString() ?? '');
   const [feedback, setFeedback] = useState(submission.feedback ?? '');
+  const [reviewedFileUrl, setReviewedFileUrl] = useState(submission.reviewedFileUrl);
+  const [annotating, setAnnotating] = useState(false);
   const error = gradeMutation.isError ? (gradeMutation.error as Error).message : undefined;
 
   return (
@@ -26,6 +30,7 @@ function GradeRow({ submission, maxMarks, assignmentId }: { submission: Submissi
             View file
           </a>
         )}
+        {submission.fileUrl && <div className="mt-2"><Button size="sm" variant="outline" onClick={() => setAnnotating(true)}>Mark PDF</Button>{reviewedFileUrl && <a href={reviewedFileUrl} target="_blank" rel="noreferrer" className="ml-2 text-xs text-primary underline">Reviewed PDF</a>}</div>}
       </Td>
       <Td>
         <StatusBadge status={submission.status} />
@@ -56,13 +61,16 @@ function GradeRow({ submission, maxMarks, assignmentId }: { submission: Submissi
             onClick={() =>
               gradeMutation.mutate({
                 id: submission._id,
-                input: { marks: Number(marks), feedback: feedback || undefined },
+                input: { marks: Number(marks), feedback: feedback || undefined, reviewedFileUrl },
               })
             }
           >
             Save grade
           </Button>
         </div>
+        <Modal open={annotating} onClose={() => setAnnotating(false)} title={`Mark: ${userName(submission.student)}`} className="max-w-5xl">
+          {submission.fileUrl && <PdfAnnotator sourceUrl={submission.fileUrl} onSaved={(url) => { setReviewedFileUrl(url); setAnnotating(false); }} />}
+        </Modal>
       </Td>
     </Tr>
   );

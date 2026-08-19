@@ -61,6 +61,7 @@ export default async function StudentAssignmentDetailPage({
               {existing.marks} <span className="text-sm text-primary/50">/ {assignment.maxMarks}</span>
             </p>
             {existing.feedback && <p className="text-primary/75">“{existing.feedback}”</p>}
+            {existing.reviewedFileUrl && <a href={existing.reviewedFileUrl} target="_blank" rel="noreferrer" className="inline-block text-sm font-medium text-primary underline">View teacher's marked PDF</a>}
           </CardContent>
         </Card>
       ) : (

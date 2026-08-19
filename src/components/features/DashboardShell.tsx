@@ -9,7 +9,8 @@ import { PageTransition } from '@/components/ui/PageTransition';
 
 const NAV: Record<UserRole, { href: string; label: string; icon: React.ElementType }[]> = {
   admin: [
-    { href: '/admin/users', label: 'Users', icon: Users },
+    { href: '/admin/teachers', label: 'Teachers', icon: Users },
+    { href: '/admin/students', label: 'Students', icon: GraduationCap },
     { href: '/admin/classes', label: 'Classes', icon: LayoutGrid },
     { href: '/admin/subjects', label: 'Subjects', icon: BookOpen },
     { href: '/admin/teacher-mapping', label: 'Teacher Mapping', icon: Link2 },

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Search, Trash2 } from 'lucide-react';
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from '@/hooks/useAdminData';
 import { Table, Thead, Tbody, Tr, Th, Td, EmptyState } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
@@ -31,12 +31,14 @@ type EditValues = z.infer<typeof editSchema>;
 
 const roleTone = { admin: 'gold', teacher: 'ok', student: 'neutral' } as const;
 
-export function UsersManager({ initialData, classes }: { initialData: User[]; classes: ClassCourse[] }) {
-  const { data: users = [] } = useUsers(initialData);
+export function UsersManager({ initialData, classes, roleFilter }: { initialData: User[]; classes: ClassCourse[]; roleFilter?: User['role'] }) {
+  const { data: users = [] } = useUsers(roleFilter, initialData);
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
   const [editing, setEditing] = useState<User | 'new' | null>(null);
+  const [query, setQuery] = useState('');
+  const [classFilter, setClassFilter] = useState('');
 
   const createForm = useForm<CreateValues>({
     resolver: zodResolver(createSchema),
@@ -47,7 +49,7 @@ export function UsersManager({ initialData, classes }: { initialData: User[]; cl
   const role = editing === 'new' ? createForm.watch('role') : editForm.watch('role');
 
   const openNew = () => {
-    createForm.reset({ name: '', email: '', password: '', role: 'student', classCourse: '' });
+    createForm.reset({ name: '', email: '', password: '', role: roleFilter ?? 'student', classCourse: '' });
     setEditing('new');
   };
   const openEdit = (u: User) => {
@@ -69,6 +71,11 @@ export function UsersManager({ initialData, classes }: { initialData: User[]; cl
   };
 
   const mutation = editing === 'new' ? createMutation : updateMutation;
+  const visibleUsers = users.filter((user) => {
+    const matchesText = `${user.name} ${user.email}`.toLowerCase().includes(query.toLowerCase());
+    const userClass = typeof user.classCourse === 'string' ? user.classCourse : user.classCourse?._id;
+    return matchesText && (!classFilter || userClass === classFilter);
+  });
 
   return (
     <div>
@@ -78,7 +85,12 @@ export function UsersManager({ initialData, classes }: { initialData: User[]; cl
         </Button>
       </div>
 
-      {users.length === 0 ? (
+      <div className="mb-4 grid gap-3 sm:grid-cols-2">
+        <div className="relative"><Search size={16} className="absolute left-3 top-2.5 text-primary/40" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="pl-9" /></div>
+        <Select value={classFilter} onChange={(event) => setClassFilter(event.target.value)}><option value="">All classes</option>{classes.map((c) => <option key={c._id} value={c._id}>{classLabel(c)}</option>)}</Select>
+      </div>
+
+      {visibleUsers.length === 0 ? (
         <EmptyState message="No users yet." />
       ) : (
         <Table>
@@ -93,7 +105,7 @@ export function UsersManager({ initialData, classes }: { initialData: User[]; cl
             </Tr>
           </Thead>
           <Tbody>
-            {users.map((u) => (
+            {visibleUsers.map((u) => (
               <Tr key={u._id}>
                 <Td className="font-medium text-primary">{u.name}</Td>
                 <Td>{u.email}</Td>

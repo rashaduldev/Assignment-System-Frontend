@@ -1,7 +1,7 @@
 'use server';
 
 import { apiFetch } from '@/lib/api-client';
-import type { Submission, SubmissionStatus } from '@/types';
+import type { AssignmentSubmissionProgress, Submission, SubmissionStatus } from '@/types';
 
 export async function getMySubmissions(): Promise<Submission[]> {
   return apiFetch<Submission[]>('/submissions/mine');
@@ -9,6 +9,10 @@ export async function getMySubmissions(): Promise<Submission[]> {
 
 export async function getSubmissionsForAssignment(assignmentId: string): Promise<Submission[]> {
   return apiFetch<Submission[]>(`/submissions/assignment/${assignmentId}`);
+}
+
+export async function getAssignmentSubmissionProgress(assignmentId: string): Promise<AssignmentSubmissionProgress[]> {
+  return apiFetch<AssignmentSubmissionProgress[]>(`/submissions/assignment/${assignmentId}/progress`);
 }
 
 export async function submitAnswer(

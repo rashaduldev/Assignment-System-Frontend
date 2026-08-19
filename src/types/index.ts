@@ -70,6 +70,11 @@ export interface Submission {
   updatedAt: string;
 }
 
+export interface AssignmentSubmissionProgress {
+  student: User;
+  submission: Submission | null;
+}
+
 export interface LoginResponse {
   user: User;
   accessToken: string;

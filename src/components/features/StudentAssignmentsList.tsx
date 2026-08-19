@@ -1,22 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
+import { Search } from 'lucide-react';
 import { useAssignments } from '@/hooks/useAssignments';
 import { Table, Thead, Tbody, Tr, Th, Td, EmptyState } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
+import { Input } from '@/components/ui/Field';
 import { formatDateTime, isPast } from '@/lib/utils';
 import { nameOf } from '@/lib/populated';
 import type { Assignment } from '@/types';
 
 export function StudentAssignmentsList({ initialData }: { initialData: Assignment[] }) {
   const { data: assignments = [] } = useAssignments(initialData);
+  const [query, setQuery] = useState('');
+  const visibleAssignments = assignments.filter((assignment) => `${assignment.title} ${nameOf(assignment.subject)}`.toLowerCase().includes(query.toLowerCase()));
 
   if (assignments.length === 0) {
     return <EmptyState message="No assignments have been published for your class yet." />;
   }
 
-  return (
-    <Table>
+  return (<>
+    <div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-2.5 text-primary/40" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assignment or subject" className="pl-9" /></div>
+    {visibleAssignments.length === 0 ? <EmptyState message="No assignments match your search." /> : <Table>
       <Thead>
         <Tr>
           <Th>Title</Th>
@@ -26,7 +32,7 @@ export function StudentAssignmentsList({ initialData }: { initialData: Assignmen
         </Tr>
       </Thead>
       <Tbody>
-        {assignments.map((a) => {
+        {visibleAssignments.map((a) => {
           const overdue = isPast(a.deadline);
           return (
             <Tr key={a._id}>
@@ -51,6 +57,6 @@ export function StudentAssignmentsList({ initialData }: { initialData: Assignmen
           );
         })}
       </Tbody>
-    </Table>
-  );
+    </Table>}
+  </>);
 }

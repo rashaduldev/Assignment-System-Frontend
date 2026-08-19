@@ -1,6 +1,6 @@
 import { getAssignment } from '@/actions/assignment.actions';
-import { getSubmissionsForAssignment } from '@/actions/submission.actions';
-import { GradingTable } from '@/components/features/GradingTable';
+import { getAssignmentSubmissionProgress } from '@/actions/submission.actions';
+import { AssignmentProgress } from '@/components/features/AssignmentProgress';
 
 export default async function AssignmentSubmissionsPage({
   params,
@@ -8,9 +8,9 @@ export default async function AssignmentSubmissionsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [assignment, submissions] = await Promise.all([
+  const [assignment, progress] = await Promise.all([
     getAssignment(id),
-    getSubmissionsForAssignment(id),
+    getAssignmentSubmissionProgress(id),
   ]);
 
   return (
@@ -23,7 +23,7 @@ export default async function AssignmentSubmissionsPage({
         </p>
       </div>
       <div data-aos="fade-up" data-aos-delay="100">
-        <GradingTable assignmentId={id} maxMarks={assignment.maxMarks} initialData={submissions} />
+        <AssignmentProgress assignmentId={id} maxMarks={assignment.maxMarks} initialData={progress} />
       </div>
     </div>
   );

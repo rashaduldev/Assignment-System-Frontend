@@ -138,8 +138,8 @@ export function useDeleteTeacherAssignment() {
 }
 
 // ----- Users -----
-export function useUsers(initialData?: User[]) {
-  return useQuery({ queryKey: ['users'], queryFn: () => getUsers(), initialData });
+export function useUsers(role?: User['role'], initialData?: User[]) {
+  return useQuery({ queryKey: ['users', role ?? 'all'], queryFn: () => getUsers(role), initialData });
 }
 export function useCreateUser() {
   const qc = useQueryClient();

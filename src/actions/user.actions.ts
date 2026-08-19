@@ -19,8 +19,8 @@ export interface UpdateUserInput {
   isActive?: boolean;
 }
 
-export async function getUsers(): Promise<User[]> {
-  return apiFetch<User[]>('/users');
+export async function getUsers(role?: UserRole): Promise<User[]> {
+  return apiFetch<User[]>(`/users${role ? `?role=${role}` : ''}`);
 }
 
 export async function createUser(input: CreateUserInput): Promise<User> {

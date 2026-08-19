@@ -50,7 +50,7 @@ export function useSubmitAnswer(assignmentId: string) {
 export function useGradeSubmission(assignmentId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: { marks: number; feedback?: string } }) =>
+    mutationFn: ({ id, input }: { id: string; input: { marks: number; feedback?: string; reviewedFileUrl?: string } }) =>
       gradeSubmission(id, input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['submissions', 'assignment', assignmentId] });

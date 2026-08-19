@@ -61,6 +61,7 @@ export interface Submission {
   student: string | User;
   answerText?: string;
   fileUrl?: string;
+  reviewedFileUrl?: string;
   status: SubmissionStatus;
   marks?: number;
   feedback?: string;
